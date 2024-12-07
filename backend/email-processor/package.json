@@ -1,0 +1,23 @@
+{
+  "name": "email-processor",
+  "version": "1.0.0",
+  "description": "Email processing service",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.5",
+    "dotenv": "^16.4.5",
+    "openai": "^4.76.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0",
+    "nodemon": "^3.1.5"
+  },
+  "type": "module"
+}

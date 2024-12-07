@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  web-server:
+    build:
+      context: ./backend/web-server
+    volumes:
+      - ./backend:/app
+      - /app/web-server/node_modules
+    ports:
+      - "5000:5000"
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - DB_HOST=postgres
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - NYLAS_API_KEY=${NYLAS_API_KEY}
+      - NYLAS_CLIENT_ID=${NYLAS_CLIENT_ID}
+      - NYLAS_CALLBACK_URI=${NYLAS_CALLBACK_URI}
+    depends_on:
+      - rabbitmq
+      - postgres
+
+  email-processor:
+    build:
+      context: ./backend/email-processor
+    volumes:
+      - ./backend:/app
+      - /app/email-processor/node_modules
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - DB_HOST=postgres
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - rabbitmq
+      - postgres
+
+  email-syncer:
+    build:
+      context: ./backend/email-syncer
+    volumes:
+      - ./backend:/app
+      - /app/email-syncer/node_modules
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - DB_HOST=postgres
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - NYLAS_API_KEY=${NYLAS_API_KEY}
+      - NYLAS_CLIENT_ID=${NYLAS_CLIENT_ID}
+      - NYLAS_CALLBACK_URI=${NYLAS_CALLBACK_URI}
+    depends_on:
+      - rabbitmq
+      - postgres
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+    depends_on:
+      - web-server
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # AMQP protocol port
+      - "15672:15672" # Management UI port
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  rabbitmq-data:
+  postgres-data:
