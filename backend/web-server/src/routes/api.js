@@ -50,11 +50,11 @@ router.post("/sync", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/current_user", (req, res) => {
+router.get("/current_user", async (req, res) => {
   if (!req.session.userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
-  const user = queries.users.get(req.session.userId);
+  const user = await queries.users.get(req.session.userId);
   res.json(user);
 });
 
