@@ -1,26 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import { Box, VStack, Text, Spinner } from "@chakra-ui/react";
-import { getEmails } from "../services/api";
 
-function EmailList() {
-  const [emails, setEmails] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchEmails();
-  }, []);
-
-  const fetchEmails = async () => {
-    try {
-      const data = await getEmails();
-      setEmails(data.emails);
-      setLoading(false);
-    } catch (err) {
-      setError("Failed to fetch emails");
-      setLoading(false);
-    }
-  };
+const EmailList = ({ emails, loading, error }) => {
 
   if (loading) return <Spinner />;
   if (error) return <Text color="red.500">{error}</Text>;
@@ -47,6 +29,12 @@ function EmailList() {
       ))}
     </VStack>
   );
-}
+};
+
+EmailList.propTypes = {
+  emails: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired,
+  error: PropTypes.string,
+};
 
 export default EmailList; 

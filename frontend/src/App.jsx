@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ChakraProvider, Container, VStack } from "@chakra-ui/react";
 import useAxios from "axios-hooks";
@@ -9,10 +9,31 @@ import SyncButton from "./components/SyncButton";
 import AuthCallback from "./components/AuthCallback";
 import Login from "./components/Login";
 
+import { getEmails } from "./services/api";
+
 export const AuthContext = createContext(null);
 
 function App() {
   const [{ data: user }, refetch] = useAxios("/api/current_user");
+  const [emails, setEmails] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchEmails = async () => {
+    setLoading(true);
+    try {
+      const data = await getEmails();
+      setEmails(data.emails);
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to fetch emails");
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmails();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, refetch }}>
@@ -28,8 +49,8 @@ function App() {
                     <Header />
                     {user ? (
                       <>
-                        <SyncButton />
-                        <EmailList />
+                        <SyncButton fetchEmails={fetchEmails} />
+                        <EmailList emails={emails} loading={loading} error={error} />
                       </>
                     ) : (
                       <Login />
