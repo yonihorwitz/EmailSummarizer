@@ -8,6 +8,7 @@ import EmailList from "./components/EmailList";
 import SyncButton from "./components/SyncButton";
 import AuthCallback from "./components/AuthCallback";
 import Login from "./components/Login";
+import EmailPieChart from "./components/EmailPieChart";
 
 import { getEmails } from "./services/api";
 
@@ -50,6 +51,7 @@ function App() {
                     {user ? (
                       <>
                         <SyncButton fetchEmails={fetchEmails} />
+                        <EmailPieChart emails={emails} />
                         <EmailList emails={emails} loading={loading} error={error} />
                       </>
                     ) : (
