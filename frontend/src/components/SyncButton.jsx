@@ -3,14 +3,14 @@ import PropTypes from "prop-types";
 import { Button, useToast } from "@chakra-ui/react";
 import { syncEmails } from "../services/api";
 
-const SyncButton = ({ fetchEmails }) => {
+const SyncButton = ({ fetchUser }) => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
   const handleSync = async () => {
     setLoading(true);
     setTimeout(async () => {
-      await fetchEmails();
+      await fetchUser();
       setLoading(false);
     }, 5000);
     try {
@@ -40,7 +40,7 @@ const SyncButton = ({ fetchEmails }) => {
 };
 
 SyncButton.propTypes = {
-  fetchEmails: PropTypes.func.isRequired,
+  fetchUser: PropTypes.func.isRequired,
 };
 
 export default SyncButton;

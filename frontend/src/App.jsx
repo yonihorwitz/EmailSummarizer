@@ -1,11 +1,10 @@
 import React, { createContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ChakraProvider, Container, VStack, Stack, Button } from "@chakra-ui/react";
-import useAxios from "axios-hooks";
+import { ChakraProvider, Container, VStack, Stack } from "@chakra-ui/react";
 
 import Header from "./components/Header";
 import EmailList from "./components/EmailList";
-import SyncButton from "./components/SyncButton";
+import Toolbar from "./components/Toolbar";
 import AuthCallback from "./components/AuthCallback";
 import Login from "./components/Login";
 import EmailPieChart from "./components/EmailPieChart";
@@ -63,10 +62,7 @@ function App() {
                     <Header />
                     {user ? (
                       <>
-                        <Stack direction="row">
-                          <SyncButton fetchEmails={fetchEmails} />
-                          <Button onClick={handleLogout}>Logout</Button>
-                        </Stack>
+                        <Toolbar fetchUser={fetchUser} onLogout={handleLogout} user={user} />
                         <Stack direction="row">
                           <EmailList emails={emails} loading={loading} error={error} />
                           <EmailPieChart emails={emails} />
