@@ -13,6 +13,16 @@ export const login = async (username, password) => {
   }
 };
 
+export const getCurrentUser = async () => {
+  const response = await api.get("/current_user");
+  return response.data;
+};
+
+export const logout = async () => {
+  const response = await api.post("/auth/logout");
+  return response.data;
+};
+
 export const validateAuth = async (code) => {
   try {
     const response = await api.post("/auth/validate", { code });

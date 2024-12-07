@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ChakraProvider, Container, VStack } from "@chakra-ui/react";
+import { ChakraProvider, Container, VStack, Stack, Button } from "@chakra-ui/react";
 import useAxios from "axios-hooks";
 
 import Header from "./components/Header";
@@ -10,21 +10,28 @@ import AuthCallback from "./components/AuthCallback";
 import Login from "./components/Login";
 import EmailPieChart from "./components/EmailPieChart";
 
-import { getEmails } from "./services/api";
+import { getCurrentUser, getEmails, logout } from "./services/api";
 
 export const AuthContext = createContext(null);
 
 function App() {
-  const [{ data: user }, refetch] = useAxios("/api/current_user");
+  const [user, setUser] = useState(null);
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const fetchUser = async () => {
+    const data = await getCurrentUser();
+    setUser(data);
+    await fetchEmails();
+  };
 
   const fetchEmails = async () => {
     setLoading(true);
     try {
       const data = await getEmails();
       setEmails(data.emails);
+      setError(null);
       setLoading(false);
     } catch (err) {
       setError("Failed to fetch emails");
@@ -32,17 +39,23 @@ function App() {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+    setEmails([]);
+  };
+
   useEffect(() => {
-    fetchEmails();
+    fetchUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, refetch }}>
+    <AuthContext.Provider value={{ user }}>
       <ChakraProvider>
         <BrowserRouter>
           <Container maxW="container.xl" py={5}>
             <Routes>
-              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/auth/callback" element={<AuthCallback refetch={fetchUser} />} />
               <Route
                 path="/"
                 element={
@@ -50,9 +63,14 @@ function App() {
                     <Header />
                     {user ? (
                       <>
-                        <SyncButton fetchEmails={fetchEmails} />
-                        <EmailPieChart emails={emails} />
-                        <EmailList emails={emails} loading={loading} error={error} />
+                        <Stack direction="row">
+                          <SyncButton fetchEmails={fetchEmails} />
+                          <Button onClick={handleLogout}>Logout</Button>
+                        </Stack>
+                        <Stack direction="row">
+                          <EmailList emails={emails} loading={loading} error={error} />
+                          <EmailPieChart emails={emails} />
+                        </Stack>
                       </>
                     ) : (
                       <Login />

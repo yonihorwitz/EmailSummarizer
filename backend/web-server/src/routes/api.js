@@ -69,6 +69,15 @@ router.get("/nylas/auth", (req, res) => {
   }
 });
 
+router.post("/auth/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to logout" });
+    }
+    res.json({ message: "Logged out successfully" });
+  });
+});
+
 // callback route Nylas redirects to
 router.post("/auth/validate", async (req, res) => {
   const code = req.body.code;

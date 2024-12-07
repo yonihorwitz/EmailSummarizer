@@ -1,14 +1,12 @@
-import React, { useEffect, useContext, useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Spinner, Center, useToast } from "@chakra-ui/react";
-import { AuthContext } from "../App";
 import { validateAuth } from "../services/api";
-
-function AuthCallback() {
+function AuthCallback({ refetch }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const toast = useToast();
-  const { refetch } = useContext(AuthContext);
   const processedRef = useRef(false);
 
   const handleCallback = async () => {
@@ -20,7 +18,7 @@ function AuthCallback() {
       if (!code) {
         throw new Error("No authorization code received");
       }
-      const resp = await validateAuth(code);
+      await validateAuth(code);
       refetch();
 
       toast({
@@ -50,6 +48,10 @@ function AuthCallback() {
       <Spinner size="xl" />
     </Center>
   );
-}
+};
+
+AuthCallback.propTypes = {
+  refetch: PropTypes.func.isRequired,
+};
 
 export default AuthCallback;
