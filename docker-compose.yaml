@@ -18,6 +18,7 @@ services:
       - NYLAS_API_KEY=${NYLAS_API_KEY}
       - NYLAS_CLIENT_ID=${NYLAS_CLIENT_ID}
       - NYLAS_CALLBACK_URI=${NYLAS_CALLBACK_URI}
+      - SESSION_SECRET=${SESSION_SECRET}
     depends_on:
       - rabbitmq
       - postgres
