@@ -16,7 +16,7 @@ export async function syncEmails({ userId, timestamp }, queueEmail) {
             identifier: user.nylas_token,
             queryParams: {
                 received_after: user.last_sync ? lastSync : yesterday,
-                limit: 10,
+                limit: 10,  // Nylas account limit
             },
         });
         for (const message of messages.data) {

@@ -25,5 +25,15 @@ export const queries = {
         [category, summary, id]
       );
     },
+    async getEmailCategories(numCategories = 5) {
+      const result = await pool.query(
+        `SELECT category, COUNT(*) as category_count 
+        FROM emails
+        GROUP BY category
+        ORDER BY category_count DESC
+        LIMIT ${numCategories}`
+      );
+      return result.rows;
+    },
   }
 };
