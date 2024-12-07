@@ -61,8 +61,9 @@ OpenAI's completion engine was used to e-mail summarization and categorization. 
 
 ## TODO:
 
-- TYPESCRIPT
+- Typescript
 - Better DB migration management, or ORM
-- Generic API for e-mail sync tool
+- Generic API wrapper for e-mail sync
 - Tests
-- Async message back to FE on sync completion
+- Async message back to FE on sync completion (currently using 5 second timeout)
+- Email list pagination
